@@ -18,7 +18,7 @@ class User extends Model<
   declare email: string;
   declare password: string;
   declare role: UserRole;
-  declare isActivate: boolean;
+  declare isActivate: CreationOptional<boolean>;
 
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
