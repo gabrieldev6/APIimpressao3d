@@ -1,12 +1,29 @@
-import {describe, it, expect} from 'vitest';
-import User from '../../src/models/User';
+import { describe, it, expect } from 'vitest';
+import User from '../../src/models/User'
+import { UserRole } from '../../src/types/enums';
 
-
-describe('isValidEmail',() => {
-    
-    it('should return true for valid email', () => {
-        const user = User.create(1, "John Doe", "john.doe@example.com", "password123", 0, true, new Date(), new Date()
-        );
-        expect(user.isValidEmail("john.doe@example.com")).toBe(true);
+describe('User Model', () => {
+  it('deve identificar um usuário administrador', () => {
+    const user = User.build({
+      name: 'Administrador',
+      email: 'admin@example.com',
+      password: '123456',
+      role: UserRole.ADMIN,
     });
+
+    expect(user.isAdmin()).toBe(true);
+  });
+
+  it('deve desativar um usuário', () => {
+    const user = User.build({
+      name: 'Usuário',
+      email: 'user@example.com',
+      password: '123456',
+      role: UserRole.USER,
+    });
+
+    user.deactivate();
+
+    expect(user.isActivate).toBe(false);
+  });
 });

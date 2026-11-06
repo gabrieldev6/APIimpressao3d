@@ -9,6 +9,6 @@ describe('GET /health', () => {
         const response = await request(app).get('/');
 
         expect(response.status).toBe(200);
-        // expect(response.body).toBe({ status: 'ok' });
+        
     });
 });
