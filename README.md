@@ -39,6 +39,12 @@ O objetivo da API é centralizar o fluxo completo de uma operação de impressã
 5. **Pagamentos** por PIX, cartão, dinheiro ou transferência.
 6. **Produção:** controle das impressoras e dos *print jobs* (trabalhos de impressão), com tempo estimado x real, consumo de material e motivo de falha.
 
+### Uma breve historia
+A faculdade em que eu estudava (IFCE – Campus Aracati) contava com algumas impressoras 3D que atendiam a todo o campus. Cursos técnicos como Química, Hotelaria e outros tinham demanda para fabricar peças sob demanda; no entanto, a gestão de tempo, de materiais, do fluxo de impressões, das peças e de outros aspectos era organizada por planilhas que, muitas vezes, ficavam desatualizadas.
+
+Diante desse cenário, foi proposto um desafio para criar um sistema de gerenciamento de impressões que pudesse suprir as necessidades do campus, porém ninguém se propôs a realizá-lo de fato. Aproveitando a oportunidade, decidi criar algo que pudesse ser usado com essa finalidade — mas incluindo recursos de pagamento para que eu também possa utilizá-lo comercialmente. Vale ressaltar que eu já possuo impressoras 3D voltadas para a prestação de serviços de impressão sob encomenda.
+
+
 ---
 
 ## Tecnologias
