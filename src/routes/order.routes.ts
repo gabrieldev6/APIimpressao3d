@@ -1,32 +1,25 @@
 import { Router } from "express";
+import { OrderController } from "../controllers";
 
 const router = Router();
 
-router.post("/", (req, res) => {
-  res.status(201).json({ message: 'Criar pedido' });
-});
+// Listar todos os pedidos
+router.get("/", OrderController.index);
 
-router.get("/", (req, res) => {
-  res.status(200).json({ message: 'Listando todos os pedidos' });
-});
+// Buscar pedido pelo ID
+router.get("/:id", OrderController.show);
 
-router.get("/:id", (req, res) => {
-    res.status(200).json({ 
-        message: `Listando pedido com id ${req.params.id}`,
-        id: req.params.id
-    });
-});
+// Cadastrar pedido
+router.post("/", OrderController.store);
 
-router.patch("/:id", (req, res) => {
-    res.status(200).json({ 
-        message: `Atualizando pedido com id ${req.params.id}`,
-    });
-});
+// Atualizar pedido
+router.patch("/:id", OrderController.update);
 
-router.delete("/:id", (req, res) => {
-    res.status(200).json({ 
-        message: `Deletando pedido com id ${req.params.id}`,
-    });
-});
+// Cancelar pedido
+router.patch("/:id/notes", OrderController.cancel);
+
+// Desativar pedido
+router.delete("/:id", OrderController.destroy);
+
 
 export default router;
