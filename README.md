@@ -1,4 +1,4 @@
-# API Impressão 3D
+# PROJETO B - API Impressão 3D 
 
 API REST para gerenciar a operação de um negócio de **impressão 3D sob demanda**: clientes, catálogo de produtos, estoque de filamentos/resinas, pedidos, pagamentos, parque de impressoras e a fila de trabalhos de impressão.
 

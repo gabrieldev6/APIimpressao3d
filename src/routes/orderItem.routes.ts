@@ -15,3 +15,5 @@ router.patch('/:id', OrderItemController.update);
 
 // Excluir item de pedido
 router.delete('/:id', OrderItemController.destroy);
+
+export default router;

@@ -20,3 +20,5 @@ router.patch('/:id/mark-as-paid', PaymentController.markAsPaid);
 
 // Excluir pagamento
 router.delete('/:id', PaymentController.destroy);
+
+export default router;

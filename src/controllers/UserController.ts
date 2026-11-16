@@ -13,10 +13,11 @@ export class UserController {
       password,
       role,
     });
-
+    const { password: _password, ...safeUser } = user.toJSON();
+    
     return res.status(201).json({
       message: 'Usuário criado com sucesso. 1',
-      user,
+      user: safeUser,
     });
   } catch (error) {
     console.error('Erro ao cadastrar usuário:', error);

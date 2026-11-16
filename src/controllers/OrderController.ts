@@ -4,7 +4,7 @@ import { OrderStatus } from '../types/enums';
 import { getId, handleControllerError, invalidId, notFound } from './controllerUtils';
 
 export default class OrderController {
-  
+
   static async index(_req: Request, res: Response) {
     try {
       const orders = await Order.findAll({
@@ -82,7 +82,16 @@ export default class OrderController {
 
       return res.status(201).json({ message: 'Pedido cadastrado com sucesso.', order });
     } catch (error) {
+
+      if (
+        error instanceof Error &&
+        error.message === 'Valores do pedido inválidos.'
+      ) {
+        return res.status(400).json({ message: error.message });
+      }
+
       return handleControllerError(res, error, 'pedido');
+
     }
   }
 
@@ -138,6 +147,13 @@ export default class OrderController {
       await order.update(data);
       return res.status(200).json({ message: 'Pedido atualizado com sucesso.', order });
     } catch (error) {
+       if (
+        error instanceof Error &&
+        error.message === 'Valores do pedido inválidos.'
+      ) {
+        return res.status(400).json({ message: error.message });
+      }
+
       return handleControllerError(res, error, 'pedido');
     }
   }
