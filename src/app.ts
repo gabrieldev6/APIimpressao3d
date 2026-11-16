@@ -1,5 +1,12 @@
 import express from 'express';
 
+// documentação com swagger
+import swaggerUi from 'swagger-ui-express';
+import { parse } from 'yaml';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+
 // Routes
 import orderRoutes from './routes/order.routes';
 import orderItemRoutes from './routes/orderItem.routes';
@@ -12,6 +19,19 @@ import printJobRoutes from './routes/printJob.routes';
 import customerRoutes from './routes/customer.routes';
 
 const app = express();
+
+const openApiDocument = parse(
+  readFileSync(
+    resolve(process.cwd(), 'docs/openapi.yaml'),
+    'utf8'
+  )
+);
+
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(openApiDocument)
+);
 
 app.use(express.json());
 

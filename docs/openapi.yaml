@@ -1,0 +1,1841 @@
+openapi: 3.0.3
+
+info:
+  title: API de Gerenciamento de Impressão 3D
+  version: 1.0.0
+  description: |
+    API REST para gerenciamento de clientes, usuários, produtos, materiais,
+    pedidos, pagamentos, impressoras e trabalhos de impressão 3D.
+    Os valores e exemplos representam os contratos observados no código atual.
+
+servers:
+  - url: http://localhost:3000/api
+    description: Ambiente local
+
+tags:
+  - name: Users
+    description: Gerenciamento de usuários
+  - name: Customers
+    description: Gerenciamento de clientes
+  - name: Products
+    description: Gerenciamento de produtos
+  - name: Materials
+    description: Gerenciamento de materiais
+  - name: Orders
+    description: Gerenciamento de pedidos
+  - name: Order Items
+    description: Itens dos pedidos
+  - name: Payments
+    description: Pagamentos dos pedidos
+  - name: Printers
+    description: Impressoras cadastradas
+  - name: Print Jobs
+    description: Trabalhos de impressão
+
+paths:
+  /users:
+    get:
+      tags: [Users]
+      summary: Listar usuários
+      operationId: listUsers
+      responses:
+        '200':
+          description: Lista de usuários
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Users]
+      summary: Cadastrar usuário
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+            example:
+              name: Maria Silva
+              email: maria@example.com
+              password: senha-segura
+              role: OPERATOR
+      responses:
+        '201':
+          description: Usuário criado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: E-mail já cadastrado
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Buscar usuário por ID
+      operationId: getUserById
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Usuário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /customers:
+    get:
+      tags: [Customers]
+      summary: Listar clientes
+      operationId: listCustomers
+      responses:
+        '200':
+          description: Lista de clientes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Customers]
+      summary: Cadastrar cliente
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInput'
+            example:
+              name: João Silva
+              email: joao@example.com
+              phone: '88999999999'
+              document: '12345678900'
+              address: Rua das Flores, 100
+              city: Aracati
+              state: CE
+              zipCode: '62800000'
+      responses:
+        '201':
+          description: Cliente cadastrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  customer:
+                    $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /customers/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Customers]
+      summary: Buscar cliente por ID
+      operationId: getCustomerById
+      responses:
+        '200':
+          description: Cliente encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Customers]
+      summary: Atualizar cliente
+      description: Envie somente os campos que deseja alterar.
+      operationId: updateCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerUpdate'
+      responses:
+        '200':
+          description: Cliente atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  customer:
+                    $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Customers]
+      summary: Excluir cliente
+      operationId: deleteCustomer
+      responses:
+        '200':
+          description: Cliente removido
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /products:
+    get:
+      tags: [Products]
+      summary: Listar produtos
+      operationId: listProducts
+      responses:
+        '200':
+          description: Lista de produtos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Products]
+      summary: Cadastrar produto
+      operationId: createProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductInput'
+      responses:
+        '201':
+          description: Produto cadastrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  product:
+                    $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /products/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Products]
+      summary: Buscar produto por ID
+      operationId: getProductById
+      responses:
+        '200':
+          description: Produto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Products]
+      summary: Atualizar produto
+      operationId: updateProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
+      responses:
+        '200':
+          description: Produto atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  product:
+                    $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Products]
+      summary: Excluir produto
+      operationId: deleteProduct
+      responses:
+        '200':
+          description: Produto removido
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /products/{id}/deactivate:
+    patch:
+      tags: [Products]
+      summary: Desativar produto
+      operationId: deactivateProduct
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Produto desativado
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /materials:
+    get:
+      tags: [Materials]
+      summary: Listar materiais
+      operationId: listMaterials
+      responses:
+        '200':
+          description: Lista de materiais
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Material'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Materials]
+      summary: Cadastrar material
+      operationId: createMaterial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaterialInput'
+      responses:
+        '201':
+          description: Material cadastrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  material:
+                    $ref: '#/components/schemas/Material'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /materials/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Materials]
+      summary: Buscar material por ID
+      operationId: getMaterialById
+      responses:
+        '200':
+          description: Material encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Material'
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Materials]
+      summary: Atualizar material
+      operationId: updateMaterial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaterialUpdate'
+      responses:
+        '200':
+          description: Material atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  material:
+                    $ref: '#/components/schemas/Material'
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Materials]
+      summary: Excluir material
+      operationId: deleteMaterial
+      responses:
+        '200':
+          description: Material removido
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /orders:
+    get:
+      tags: [Orders]
+      summary: Listar pedidos
+      operationId: listOrders
+      responses:
+        '200':
+          description: Lista de pedidos com cliente, itens e pagamentos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Orders]
+      summary: Cadastrar pedido
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderInput'
+            example:
+              customerId: 1
+              status: PENDING
+              totalAmount: 150.00
+              discount: 10.00
+              notes: Pedido para entrega
+      responses:
+        '201':
+          description: Pedido cadastrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  order:
+                    $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /orders/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Orders]
+      summary: Buscar pedido por ID
+      operationId: getOrderById
+      responses:
+        '200':
+          description: Pedido encontrado com cliente, itens e pagamentos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Orders]
+      summary: Atualizar pedido
+      operationId: updateOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderUpdate'
+      responses:
+        '200':
+          description: Pedido atualizado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Orders]
+      summary: Excluir pedido
+      operationId: deleteOrder
+      responses:
+        '200':
+          description: Pedido removido ou desativado conforme implementação do controller
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /orders/{id}/notes:
+    patch:
+      tags: [Orders]
+      summary: Cancelar pedido
+      description: Executa a operação de cancelamento implementada no controller.
+      operationId: cancelOrder
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Pedido cancelado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /order-items:
+    get:
+      tags: [Order Items]
+      summary: Listar itens de pedidos
+      operationId: listOrderItems
+      parameters:
+        - name: orderId
+          in: query
+          required: false
+          description: Filtra os itens por pedido.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de itens com dados do produto
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderItem'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Order Items]
+      summary: Adicionar item a um pedido
+      operationId: createOrderItem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderItemInput'
+            example:
+              orderId: 1
+              productId: 1
+              quantity: 2
+              unitPrice: 35.50
+      responses:
+        '201':
+          description: Item adicionado ao pedido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  item:
+                    $ref: '#/components/schemas/OrderItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Pedido ou produto não encontrado
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /order-items/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Order Items]
+      summary: Buscar item de pedido por ID
+      operationId: getOrderItemById
+      responses:
+        '200':
+          description: Item encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderItem'
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Order Items]
+      summary: Atualizar item de pedido
+      operationId: updateOrderItem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderItemUpdate'
+      responses:
+        '200':
+          description: Item atualizado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Order Items]
+      summary: Excluir item de pedido
+      operationId: deleteOrderItem
+      responses:
+        '200':
+          description: Item removido
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /payments:
+    get:
+      tags: [Payments]
+      summary: Listar pagamentos
+      operationId: listPayments
+      parameters:
+        - name: orderId
+          in: query
+          required: false
+          description: Filtra pagamentos por pedido.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de pagamentos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Payments]
+      summary: Registrar pagamento
+      operationId: createPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInput'
+            example:
+              orderId: 1
+              amount: 140.00
+              method: PIX
+              status: PENDING
+              transactionId: tx-123
+      responses:
+        '201':
+          description: Pagamento registrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  payment:
+                    $ref: '#/components/schemas/Payment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Pedido não encontrado
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /payments/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Payments]
+      summary: Buscar pagamento por ID
+      operationId: getPaymentById
+      responses:
+        '200':
+          description: Pagamento encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Payments]
+      summary: Atualizar pagamento
+      operationId: updatePayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentUpdate'
+      responses:
+        '200':
+          description: Pagamento atualizado
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Payments]
+      summary: Excluir pagamento
+      operationId: deletePayment
+      responses:
+        '200':
+          description: Pagamento removido
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /payments/{id}/mark-as-paid:
+    patch:
+      tags: [Payments]
+      summary: Marcar pagamento como pago
+      operationId: markPaymentAsPaid
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Pagamento marcado como pago
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /printers:
+    get:
+      tags: [Printers]
+      summary: Listar impressoras
+      operationId: listPrinters
+      responses:
+        '200':
+          description: Lista de impressoras
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Printer'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Printers]
+      summary: Cadastrar impressora
+      operationId: createPrinter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrinterInput'
+      responses:
+        '201':
+          description: Impressora cadastrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  printer:
+                    $ref: '#/components/schemas/Printer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /printers/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Printers]
+      summary: Buscar impressora por ID
+      operationId: getPrinterById
+      responses:
+        '200':
+          description: Impressora encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Printer'
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Printers]
+      summary: Atualizar impressora
+      operationId: updatePrinter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrinterUpdate'
+      responses:
+        '200':
+          description: Impressora atualizada
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Printers]
+      summary: Excluir impressora
+      operationId: deletePrinter
+      responses:
+        '200':
+          description: Impressora removida
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /printers/{id}/start:
+    patch:
+      tags: [Printers]
+      summary: Iniciar impressão na impressora
+      operationId: startPrinter
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Impressora marcada como em impressão
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /print-jobs:
+    get:
+      tags: [Print Jobs]
+      summary: Listar trabalhos de impressão
+      operationId: listPrintJobs
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: Filtra trabalhos pelo status.
+          schema:
+            $ref: '#/components/schemas/PrintJobStatus'
+      responses:
+        '200':
+          description: Lista de trabalhos com item, impressora e material
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrintJob'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Print Jobs]
+      summary: Cadastrar trabalho de impressão
+      operationId: createPrintJob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrintJobInput'
+            example:
+              orderItemId: 1
+              printerId: 1
+              materialId: 1
+              status: PENDING
+              quantity: 2
+              estimatedTime: 180
+              materialUsedGrams: 0
+              notes: Peça de teste
+      responses:
+        '201':
+          description: Trabalho de impressão cadastrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  job:
+                    $ref: '#/components/schemas/PrintJob'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Item do pedido, impressora ou material não encontrado
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /print-jobs/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Print Jobs]
+      summary: Buscar trabalho de impressão por ID
+      operationId: getPrintJobById
+      responses:
+        '200':
+          description: Trabalho encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrintJob'
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    patch:
+      tags: [Print Jobs]
+      summary: Atualizar trabalho de impressão
+      operationId: updatePrintJob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrintJobUpdate'
+      responses:
+        '200':
+          description: Trabalho atualizado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [Print Jobs]
+      summary: Excluir trabalho de impressão
+      operationId: deletePrintJob
+      responses:
+        '200':
+          description: Trabalho removido
+        '400':
+          $ref: '#/components/responses/InvalidId'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /print-jobs/{id}/start:
+    patch:
+      tags: [Print Jobs]
+      summary: Iniciar trabalho de impressão
+      operationId: startPrintJob
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Trabalho iniciado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /print-jobs/{id}/finish:
+    patch:
+      tags: [Print Jobs]
+      summary: Finalizar trabalho de impressão
+      operationId: finishPrintJob
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrintJobFinish'
+            example:
+              actualTime: 175
+              materialUsedGrams: 42.5
+      responses:
+        '200':
+          description: Trabalho finalizado
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /print-jobs/{id}/fail:
+    patch:
+      tags: [Print Jobs]
+      summary: Registrar falha no trabalho de impressão
+      operationId: failPrintJob
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrintJobFail'
+            example:
+              failureReason: Deslocamento da peça durante a impressão
+      responses:
+        '200':
+          description: Falha registrada
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      description: Identificador numérico do recurso.
+      schema:
+        type: integer
+        minimum: 1
+      example: 1
+
+  responses:
+    BadRequest:
+      description: Dados enviados são inválidos.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+    InvalidId:
+      description: Identificador inválido.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+    NotFound:
+      description: Recurso não encontrado.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+    InternalError:
+      description: Erro interno do servidor.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+
+  schemas:
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Recurso não encontrado.
+
+    UserInput:
+      type: object
+      required: [name, email, password]
+      properties:
+        name:
+          type: string
+          maxLength: 120
+          example: Maria Silva
+        email:
+          type: string
+          format: email
+          maxLength: 150
+          example: maria@example.com
+        password:
+          type: string
+          format: password
+          maxLength: 255
+          example: senha-segura
+        role:
+          type: string
+          enum: [ADMIN, OPERATOR, USER]
+          default: USER
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [ADMIN, OPERATOR, USER]
+        isActivate:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CustomerInput:
+      type: object
+      required: [name, email, phone, document, address, city, state, zipCode]
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        email:
+          type: string
+          format: email
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 20
+        document:
+          type: string
+          maxLength: 20
+          description: CPF ou CNPJ.
+        address:
+          type: string
+          maxLength: 200
+        city:
+          type: string
+          maxLength: 100
+        state:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: CE
+        zipCode:
+          type: string
+          maxLength: 10
+
+    CustomerUpdate:
+      type: object
+      description: Envie somente os campos que deseja atualizar.
+      properties:
+        name:
+          type: string
+          maxLength: 120
+        email:
+          type: string
+          format: email
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 20
+        document:
+          type: string
+          maxLength: 20
+        address:
+          type: string
+          maxLength: 200
+        city:
+          type: string
+          maxLength: 100
+        state:
+          type: string
+          minLength: 2
+          maxLength: 2
+        zipCode:
+          type: string
+          maxLength: 10
+
+    Customer:
+      allOf:
+        - $ref: '#/components/schemas/CustomerInput'
+      properties:
+        id:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ProductInput:
+      type: object
+      required: [name, description, sku, category, weight, printTime, cost, price]
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        sku:
+          type: string
+          maxLength: 50
+        category:
+          type: string
+          maxLength: 100
+        weight:
+          type: number
+          format: double
+          description: Peso em gramas.
+        printTime:
+          type: integer
+          minimum: 0
+          description: Tempo de impressão na unidade utilizada pela aplicação.
+        cost:
+          type: number
+          format: double
+        price:
+          type: number
+          format: double
+        isActive:
+          type: boolean
+          default: true
+
+    ProductUpdate:
+      type: object
+      description: Todos os campos são opcionais na atualização.
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        sku:
+          type: string
+          maxLength: 50
+        category:
+          type: string
+          maxLength: 100
+        weight:
+          type: number
+          format: double
+        printTime:
+          type: integer
+          minimum: 0
+        cost:
+          type: number
+          format: double
+        price:
+          type: number
+          format: double
+        isActive:
+          type: boolean
+
+    Product:
+      allOf:
+        - $ref: '#/components/schemas/ProductInput'
+      properties:
+        id:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    MaterialType:
+      type: string
+      enum: [PLA, PETG, ABS, TPU, RESIN, OTHER]
+
+    MaterialInput:
+      type: object
+      required: [name, type, color, brand, pricePerKg]
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        type:
+          $ref: '#/components/schemas/MaterialType'
+        color:
+          type: string
+          maxLength: 50
+        brand:
+          type: string
+          maxLength: 100
+        diameter:
+          type: number
+          format: double
+          default: 1.75
+          description: Diâmetro em milímetros.
+        pricePerKg:
+          type: number
+          format: double
+        stockGrams:
+          type: integer
+          minimum: 0
+          default: 0
+        minStockGrams:
+          type: integer
+          minimum: 0
+          default: 500
+
+    MaterialUpdate:
+      type: object
+      description: Todos os campos são opcionais na atualização.
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        type:
+          $ref: '#/components/schemas/MaterialType'
+        color:
+          type: string
+          maxLength: 50
+        brand:
+          type: string
+          maxLength: 100
+        diameter:
+          type: number
+          format: double
+        pricePerKg:
+          type: number
+          format: double
+        stockGrams:
+          type: integer
+          minimum: 0
+        minStockGrams:
+          type: integer
+          minimum: 0
+
+    Material:
+      allOf:
+        - $ref: '#/components/schemas/MaterialInput'
+      properties:
+        id:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    OrderStatus:
+      type: string
+      enum: [PENDING, APPROVED, IN_PRODUCTION, COMPLETED, CANCELLED]
+
+    OrderInput:
+      type: object
+      required: [customerId]
+      properties:
+        customerId:
+          type: integer
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        totalAmount:
+          type: number
+          format: double
+          default: 0
+        discount:
+          type: number
+          format: double
+          default: 0
+        notes:
+          type: string
+          nullable: true
+
+    OrderUpdate:
+      type: object
+      properties:
+        customerId:
+          type: integer
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        totalAmount:
+          type: number
+          format: double
+        discount:
+          type: number
+          format: double
+        notes:
+          type: string
+          nullable: true
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+        customerId:
+          type: integer
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        totalAmount:
+          type: number
+          format: double
+        discount:
+          type: number
+          format: double
+        finalAmount:
+          type: number
+          format: double
+        notes:
+          type: string
+          nullable: true
+        customer:
+          $ref: '#/components/schemas/Customer'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    OrderItemInput:
+      type: object
+      required: [orderId, productId, quantity]
+      properties:
+        orderId:
+          type: integer
+        productId:
+          type: integer
+        quantity:
+          type: integer
+          minimum: 1
+        unitPrice:
+          type: number
+          format: double
+          description: Opcional; quando omitido, utiliza o preço atual do produto.
+
+    OrderItemUpdate:
+      type: object
+      properties:
+        orderId:
+          type: integer
+        productId:
+          type: integer
+        quantity:
+          type: integer
+          minimum: 1
+        unitPrice:
+          type: number
+          format: double
+
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        orderId:
+          type: integer
+        productId:
+          type: integer
+        quantity:
+          type: integer
+        unitPrice:
+          type: number
+          format: double
+        subtotal:
+          type: number
+          format: double
+        product:
+          $ref: '#/components/schemas/Product'
+
+    PaymentMethod:
+      type: string
+      enum: [PIX, CREDIT_CARD, DEBIT_CARD, CASH, BANK_TRANSFER]
+
+    PaymentStatus:
+      type: string
+      enum: [PENDING, APPROVED, REJECTED, REFUNDED]
+
+    PaymentInput:
+      type: object
+      required: [orderId, amount, method]
+      properties:
+        orderId:
+          type: integer
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+        method:
+          $ref: '#/components/schemas/PaymentMethod'
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        transactionId:
+          type: string
+          nullable: true
+
+    PaymentUpdate:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: double
+        method:
+          $ref: '#/components/schemas/PaymentMethod'
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        transactionId:
+          type: string
+          nullable: true
+        paidAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    Payment:
+      type: object
+      properties:
+        id:
+          type: integer
+        orderId:
+          type: integer
+        amount:
+          type: number
+          format: double
+        method:
+          $ref: '#/components/schemas/PaymentMethod'
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        transactionId:
+          type: string
+          nullable: true
+        paidAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    PrinterStatus:
+      type: string
+      enum: [AVAILABLE, PRINTING, MAINTENANCE, INACTIVE]
+
+    PrinterInput:
+      type: object
+      required: [name, model, manufacturer, maxTemperature]
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        model:
+          type: string
+          maxLength: 100
+        manufacturer:
+          type: string
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/PrinterStatus'
+        nozzleDiameter:
+          type: number
+          format: double
+          default: 0.4
+        maxTemperature:
+          type: integer
+          minimum: 0
+        notes:
+          type: string
+          nullable: true
+
+    PrinterUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        model:
+          type: string
+        manufacturer:
+          type: string
+        status:
+          $ref: '#/components/schemas/PrinterStatus'
+        nozzleDiameter:
+          type: number
+          format: double
+        maxTemperature:
+          type: integer
+        notes:
+          type: string
+          nullable: true
+
+    Printer:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        model:
+          type: string
+        manufacturer:
+          type: string
+        status:
+          $ref: '#/components/schemas/PrinterStatus'
+        nozzleDiameter:
+          type: number
+          format: double
+        maxTemperature:
+          type: integer
+        notes:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PrintJobStatus:
+      type: string
+      enum: [PENDING, PRINTING, COMPLETED, FAILED, CANCELLED]
+
+    PrintJobInput:
+      type: object
+      required: [orderItemId, printerId, materialId, quantity, estimatedTime]
+      properties:
+        orderItemId:
+          type: integer
+        printerId:
+          type: integer
+        materialId:
+          type: integer
+        status:
+          $ref: '#/components/schemas/PrintJobStatus'
+        quantity:
+          type: integer
+          minimum: 1
+        estimatedTime:
+          type: integer
+          minimum: 0
+        actualTime:
+          type: integer
+          nullable: true
+        materialUsedGrams:
+          type: number
+          format: double
+          default: 0
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        finishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        failureReason:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    PrintJobUpdate:
+      type: object
+      properties:
+        orderItemId:
+          type: integer
+        printerId:
+          type: integer
+        materialId:
+          type: integer
+        status:
+          $ref: '#/components/schemas/PrintJobStatus'
+        quantity:
+          type: integer
+        estimatedTime:
+          type: integer
+        actualTime:
+          type: integer
+          nullable: true
+        materialUsedGrams:
+          type: number
+          format: double
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        finishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        failureReason:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    PrintJobFinish:
+      type: object
+      required: [actualTime, materialUsedGrams]
+      properties:
+        actualTime:
+          type: integer
+          minimum: 0
+        materialUsedGrams:
+          type: number
+          format: double
+          minimum: 0
+
+    PrintJobFail:
+      type: object
+      required: [failureReason]
+      properties:
+        failureReason:
+          type: string
+
+    PrintJob:
+      type: object
+      properties:
+        id:
+          type: integer
+        orderItemId:
+          type: integer
+        printerId:
+          type: integer
+        materialId:
+          type: integer
+        status:
+          $ref: '#/components/schemas/PrintJobStatus'
+        quantity:
+          type: integer
+        estimatedTime:
+          type: integer
+        actualTime:
+          type: integer
+          nullable: true
+        materialUsedGrams:
+          type: number
+          format: double
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        finishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        failureReason:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
