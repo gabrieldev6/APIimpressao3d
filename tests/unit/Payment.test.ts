@@ -39,6 +39,6 @@ describe('Payment model', () => {
   });
 
   it('deve aceitar valor igual a R$ 0,01', async () => {
-    await expect(makePayment({ amount: 0.01 }).validate()).resolves.toBeUndefined();
+    await expect(makePayment({ amount: 0.01 }).validate()).resolves.toBeInstanceOf(Payment);
   });
 });
