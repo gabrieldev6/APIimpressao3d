@@ -1,32 +1,24 @@
 import { Router } from "express";
+import MaterialController from "../controllers/MaterialController";
 
 const router = Router();
 
-router.post("/", (req, res) => {
-  res.status(201).json({ message: 'Criar material' });
-});
+// Listar todos os materiais
+router.get("/", MaterialController.index);
 
-router.get("/", (req, res) => {
-  res.status(200).json({ message: 'Listando todos os materiais' });
-});
+// Buscar material pelo ID
+router.get("/:id", MaterialController.show);
 
-router.get("/:id", (req, res) => {
-    res.status(200).json({ 
-        message: `Listando material com id ${req.params.id}`,
-        id: req.params.id
-    });
-});
+// Cadastrar material
+router.post("/", MaterialController.store);
 
-router.patch("/:id", (req, res) => {
-    res.status(200).json({ 
-        message: `Atualizando material com id ${req.params.id}`,
-    });
-});
+// Atualizar material
+router.patch("/:id", MaterialController.update);
 
-router.delete("/:id", (req, res) => {
-    res.status(200).json({ 
-        message: `Deletando material com id ${req.params.id}`,
-    });
-});
+// Desativar material
+router.delete("/:id", MaterialController.destroy);
+
+
+
 
 export default router;
