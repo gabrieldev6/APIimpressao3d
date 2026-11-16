@@ -1,32 +1,26 @@
 import { Router } from "express";
+import ProductController from "../controllers/ProductController";
+
 
 const router = Router();
 
-router.post("/", (req, res) => {
-  res.status(201).json({ message: 'Criar produto' });
-});
+// Listar todos os produtos
+router.get("/", ProductController.index);
 
-router.get("/", (req, res) => {
-  res.status(200).json({ message: 'Listando todos os produtos' });
-});
+// Buscar produto pelo ID
+router.get("/:id", ProductController.show);
 
-router.get("/:id", (req, res) => {
-    res.status(200).json({ 
-        message: `Listando produto com id ${req.params.id}`,
-        id: req.params.id
-    });
-});
+// Cadastrar produto
+router.post("/", ProductController.store);
 
-router.patch("/:id", (req, res) => {
-    res.status(200).json({ 
-        message: `Atualizando produto com id ${req.params.id}`,
-    });
-});
+// Atualizar produto
+router.patch("/:id", ProductController.update);
 
-router.delete("/:id", (req, res) => {
-    res.status(200).json({ 
-        message: `Deletando produto com id ${req.params.id}`,
-    });
-});
+// Desativar produto
+router.patch("/:id/deactivate", ProductController.deactivate);
+
+// Apagar produto
+router.delete("/:id", ProductController.destroy);
+
 
 export default router;
